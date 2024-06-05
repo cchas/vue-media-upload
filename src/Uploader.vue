@@ -117,7 +117,11 @@ export default {
         },
         headers: {
             type: Object,
-            default: null,
+            default: null
+        },
+        additionalPostData: {
+            type: Object,
+            default: null
         }
     },
     mounted() {
@@ -131,6 +135,7 @@ export default {
 
             config: {
                 headers: null,
+		additionalPostData: null
             },
 
             isLoading: true
@@ -140,6 +145,7 @@ export default {
         init() {
             this.savedMedia = this.media
             this.config.headers = this.headers
+	    this.config.additionalPostData = this.additionalPostData
 
             this.savedMedia.forEach((image, index) => {
                 if (!this.savedMedia[index].url) {
@@ -161,6 +167,11 @@ export default {
                         let formData = new FormData
                         let url = URL.createObjectURL(files[i])
                         formData.set('image', files[i])
+			
+			if( this.config.additionalPostData ){
+                            Object.keys( this.config.additionalPostData )
+                                .map( item => formData.set( item, this.config.additionalPostData[item] ) );
+                        }
 
                         const { data } = await axios.post(this.server, formData, this.config)
                         let addedImage = { url: url, name: data.name, size: files[i].size, type: files[i].type }
